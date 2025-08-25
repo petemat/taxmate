@@ -223,7 +223,8 @@ export function Dashboard() {
   const handleSignOut = async () => {
     try {
       await signOut()
-      router.push('/')
+      // Clear any cached auth state
+      window.location.href = '/'
       toast({
         title: 'Abgemeldet',
         description: 'Sie wurden erfolgreich abgemeldet.',
