@@ -38,20 +38,29 @@ export function AuthDebug() {
       document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
     });
     
+    alert('Auth cleared! Reloading page...')
     window.location.reload()
   }
+
+  const isWrongEnvironment = debugInfo.currentOrigin === 'http://localhost:3000' && debugInfo.hasSession
 
   return (
     <div className="fixed bottom-4 right-4 bg-black text-white p-4 rounded text-xs max-w-md">
       <h3 className="font-bold mb-2">Auth Debug</h3>
+      {isWrongEnvironment && (
+        <div className="bg-red-600 p-2 rounded mb-2 text-xs">
+          ⚠️ PROBLEM: Du bist auf localhost mit einer Produktions-Session!
+          <br />Das verursacht das Redirect-Problem.
+        </div>
+      )}
       <pre className="whitespace-pre-wrap text-xs">
         {JSON.stringify(debugInfo, null, 2)}
       </pre>
       <button 
         onClick={clearAllAuth}
-        className="mt-2 bg-red-600 px-2 py-1 rounded text-xs"
+        className={`mt-2 px-2 py-1 rounded text-xs ${isWrongEnvironment ? 'bg-red-600 animate-pulse' : 'bg-red-600'}`}
       >
-        Clear All Auth
+        {isWrongEnvironment ? '🚨 CLEAR AUTH NOW' : 'Clear All Auth'}
       </button>
     </div>
   )
