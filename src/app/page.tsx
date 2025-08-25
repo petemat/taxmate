@@ -3,7 +3,6 @@
 import { useAuth } from '@/contexts/auth-context'
 import { LoginForm } from '@/components/auth/login-form'
 import { Dashboard } from '@/components/dashboard/dashboard'
-import { AuthDebug } from '@/components/debug/auth-debug'
 import { RefreshCw } from 'lucide-react'
 
 export default function Home() {
@@ -43,10 +42,5 @@ export default function Home() {
     )
   }
 
-  return (
-    <>
-      <Dashboard />
-      <AuthDebug />
-    </>
-  )
+  return <Dashboard />
 }
