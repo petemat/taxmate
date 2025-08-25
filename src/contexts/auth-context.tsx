@@ -185,9 +185,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    if (error) {
-      throw error
+    try {
+      // Clear local auth state first for mobile compatibility
+      setUser(null)
+      setProfile(null)
+      
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        console.error('Supabase signOut error:', error)
+        // Don't throw error - continue with local cleanup
+      }
+      
+      // Force clear all Supabase tokens from storage
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0]
+      if (supabaseKey) {
+        localStorage.removeItem(`sb-${supabaseKey}-auth-token`)
+        localStorage.removeItem(`supabase.auth.token`)
+      }
+      
+    } catch (error) {
+      console.error('SignOut error:', error)
+      // Clear local state even if Supabase call fails
+      setUser(null)
+      setProfile(null)
     }
   }
 

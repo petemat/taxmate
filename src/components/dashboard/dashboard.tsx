@@ -236,13 +236,30 @@ export function Dashboard() {
       
       await signOut()
       
-      // Force full page reload to clear all state
-      setTimeout(() => {
-        window.location.href = '/'
-      }, 500) // Small delay to show toast
+      // Clear local storage for mobile compatibility
+      localStorage.clear()
+      sessionStorage.clear()
+      
+      // Use multiple redirect methods for mobile compatibility
+      if (typeof window !== 'undefined') {
+        // Method 1: Direct assignment (works on most browsers)
+        window.location.assign('/')
+        
+        // Method 2: Fallback for iOS
+        setTimeout(() => {
+          window.location.replace('/')
+        }, 100)
+        
+        // Method 3: Final fallback
+        setTimeout(() => {
+          window.location.reload()
+        }, 200)
+      }
       
     } catch (error) {
       console.error('Sign out error:', error)
+      // Force reload on error for mobile
+      window.location.reload()
       toast({
         title: 'Fehler',
         description: 'Beim Abmelden ist ein Fehler aufgetreten.',
