@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TaxMate
+
+AI-powered receipt management and tax optimization tool built with Next.js, Supabase, and OpenAI GPT-4o.
+
+## Features
+
+- **Smart OCR Processing**: Automatic text extraction from PDFs using pdf-parse and AI analysis with GPT-4o
+- **Image Recognition**: Direct image analysis using GPT-4o Vision API
+- **Secure Storage**: Supabase integration with signed URLs for file security
+- **Mobile Responsive**: Optimized UI for both desktop and mobile devices
+- **Real-time Processing**: Live status indicators during OCR processing
+- **German Tax Compliance**: Structured data extraction for German receipts and invoices
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React, TypeScript, Tailwind CSS
+- **Backend**: Next.js API routes with Node.js runtime
+- **Database**: Supabase (PostgreSQL)
+- **Storage**: Supabase Storage with signed URLs
+- **AI**: OpenAI GPT-4o (Chat Completions + Vision API)
+- **PDF Processing**: pdf-parse library
+- **Authentication**: Supabase Auth
 
 ## Getting Started
 
-First, run the development server:
-
+1. **Clone the repository**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd taxmate
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Install dependencies**
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Environment Setup**
+Copy `env.template` to `.env.local` and configure:
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+OPENAI_API_KEY=your_openai_api_key
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. **Run development server**
+```bash
+npm run dev
+```
 
-## Learn More
+Open [http://localhost:3000](http://localhost:3000) to see the application.
 
-To learn more about Next.js, take a look at the following resources:
+## API Endpoints
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `POST /api/ocr` - Process receipts with OCR and AI analysis
+- Authentication handled by Supabase Auth
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Production Notes
 
-## Deploy on Vercel
+- Uses Node.js runtime for pdf-parse compatibility
+- Includes postinstall script to prevent ENOENT errors
+- 30-second timeout on OCR requests
+- Comprehensive error handling and fallback data
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Development
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run dev      # Development server with Turbopack
+npm run build    # Production build
+npm run start    # Production server
+npm run lint     # ESLint (warnings ignored in builds)
+```
