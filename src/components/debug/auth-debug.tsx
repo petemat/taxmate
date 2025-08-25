@@ -9,11 +9,28 @@ export function AuthDebug() {
   useEffect(() => {
     const getDebugInfo = async () => {
       const { data: session } = await supabase.auth.getSession()
+      
+      // Get receipt count to debug data visibility
+      let receiptCount = 0
+      if (session.session) {
+        try {
+          const { count } = await supabase
+            .from('receipts')
+            .select('*', { count: 'exact', head: true })
+          receiptCount = count || 0
+        } catch (error) {
+          console.error('Error counting receipts:', error)
+        }
+      }
+      
       const info = {
         currentOrigin: window.location.origin,
         currentHref: window.location.href,
         hasSession: !!session.session,
         sessionUser: session.session?.user?.email || 'none',
+        userId: session.session?.user?.id || 'none',
+        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+        receiptCount: receiptCount,
         localStorage: {
           supabaseAuth: localStorage.getItem('sb-' + process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0] + '-auth-token'),
         },
