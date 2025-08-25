@@ -45,25 +45,31 @@ export function Dashboard() {
   }, [])
 
   const fetchReceipts = async () => {
-    if (!user) return
-
     try {
+      setLoading(true)
       const { data, error } = await supabase
         .from('receipts')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', user?.id)
         .order('created_at', { ascending: false })
+        .limit(50) // Limit initial load for better performance
 
       if (error) {
-        throw error
+        console.error('Error fetching receipts:', error)
+        toast({
+          title: 'Fehler',
+          description: 'Belege konnten nicht geladen werden.',
+          variant: 'destructive',
+        })
+        return
       }
 
       setReceipts(data || [])
     } catch (error) {
-      console.error('Error fetching receipts:', error)
+      console.error('Error in fetchReceipts:', error)
       toast({
-        title: 'Fehler beim Laden',
-        description: 'Die Belege konnten nicht geladen werden.',
+        title: 'Fehler',
+        description: 'Beim Laden der Belege ist ein Fehler aufgetreten.',
         variant: 'destructive',
       })
     } finally {
@@ -222,13 +228,19 @@ export function Dashboard() {
 
   const handleSignOut = async () => {
     try {
-      await signOut()
-      // Clear any cached auth state
-      window.location.href = '/'
+      // Show toast before redirect
       toast({
         title: 'Abgemeldet',
         description: 'Sie wurden erfolgreich abgemeldet.',
       })
+      
+      await signOut()
+      
+      // Force full page reload to clear all state
+      setTimeout(() => {
+        window.location.href = '/'
+      }, 500) // Small delay to show toast
+      
     } catch (error) {
       console.error('Sign out error:', error)
       toast({

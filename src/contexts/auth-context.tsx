@@ -26,18 +26,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let isMounted = true
     
-    // Safety timeout to ensure loading never gets stuck permanently
-    const safetyTimeout = setTimeout(() => {
-      if (isMounted) {
-        console.warn('Safety timeout triggered - forcing loading to false')
-        setLoading(false)
-      }
-    }, 10000) // 10 second safety net
-    
-    // Get initial session
     const getInitialSession = async () => {
       try {
-        console.log('Getting initial auth session...')
         const { data: { session }, error } = await supabase.auth.getSession()
         
         if (!isMounted) return
@@ -48,53 +38,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return
         }
 
-        console.log('Initial session:', session?.user?.email || 'No user')
         setUser(session?.user ?? null)
         
-        if (session?.user) {
-          try {
-            await fetchProfile(session.user.id)
-          } catch (error) {
-            console.error('Profile fetch failed, continuing anyway:', error)
-          }
-        }
-        
+        // Skip profile fetch for faster loading - profile is optional
         if (isMounted) {
           setLoading(false)
-          clearTimeout(safetyTimeout)
         }
       } catch (error) {
         console.error('Error in getInitialSession:', error)
         if (isMounted) {
           setLoading(false)
-          clearTimeout(safetyTimeout)
         }
       }
     }
 
+    // Reduced safety timeout for faster UX
+    const safetyTimeout = setTimeout(() => {
+      if (isMounted) {
+        setLoading(false)
+      }
+    }, 3000) // 3 seconds instead of 10
+
     getInitialSession()
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!isMounted) return
         
-        console.log('Auth state change:', event, session?.user?.email || 'No user')
-        setUser(session?.user ?? null)
-        
-        if (session?.user) {
-          try {
-            await fetchProfile(session.user.id)
-          } catch (error) {
-            console.error('Profile fetch failed during auth change, continuing anyway:', error)
-          }
-        } else {
+        if (event === 'SIGNED_IN' && session) {
+          setUser(session.user)
+          // Fetch profile in background without blocking UI
+          fetchProfile(session.user.id).catch(console.error)
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null)
           setProfile(null)
         }
         
         if (isMounted) {
           setLoading(false)
-          clearTimeout(safetyTimeout)
         }
       }
     )
