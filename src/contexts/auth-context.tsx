@@ -166,10 +166,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signInWithEmail = async (email: string) => {
+    // Force clear any existing session first
+    await supabase.auth.signOut()
+    
+    const redirectUrl = `${window.location.origin}/auth/callback`
+    console.log('Email auth redirect URL:', redirectUrl)
+    
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: redirectUrl,
       },
     })
 
@@ -179,10 +185,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signInWithGoogle = async () => {
+    // Force clear any existing session first
+    await supabase.auth.signOut()
+    
+    const redirectUrl = `${window.location.origin}/auth/callback`
+    console.log('Google auth redirect URL:', redirectUrl)
+    
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: redirectUrl,
       },
     })
 
