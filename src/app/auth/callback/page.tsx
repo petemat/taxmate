@@ -15,7 +15,14 @@ export default function AuthCallback() {
         const { data, error } = await supabase.auth.getSession()
         
         console.log('Auth callback - current origin:', window.location.origin)
+        console.log('Auth callback - full URL:', window.location.href)
         console.log('Auth callback - session data:', data.session?.user?.email || 'no session')
+        
+        // Log URL parameters to see what Supabase is sending
+        const urlParams = new URLSearchParams(window.location.search)
+        const hashParams = new URLSearchParams(window.location.hash.substring(1))
+        console.log('URL search params:', Object.fromEntries(urlParams))
+        console.log('URL hash params:', Object.fromEntries(hashParams))
         
         if (error) {
           console.error('Auth callback error:', error)
