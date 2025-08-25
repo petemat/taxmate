@@ -11,24 +11,31 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        // Handle the auth callback from URL hash/search params
         const { data, error } = await supabase.auth.getSession()
+        
+        console.log('Auth callback - current origin:', window.location.origin)
+        console.log('Auth callback - session data:', data.session?.user?.email || 'no session')
         
         if (error) {
           console.error('Auth callback error:', error)
-          router.push('/?error=auth_error')
+          // Force redirect to current origin, not localhost
+          window.location.href = `${window.location.origin}/?error=auth_error`
           return
         }
 
         if (data.session) {
-          // User is authenticated, redirect to dashboard
-          router.push('/')
+          console.log('Auth callback - redirecting authenticated user to dashboard')
+          // Force redirect to current origin dashboard
+          window.location.href = `${window.location.origin}/`
         } else {
-          // No session, redirect to login
-          router.push('/')
+          console.log('Auth callback - no session, redirecting to login')
+          // Force redirect to current origin login
+          window.location.href = `${window.location.origin}/`
         }
       } catch (error) {
         console.error('Auth callback error:', error)
-        router.push('/?error=auth_error')
+        window.location.href = `${window.location.origin}/?error=auth_error`
       }
     }
 
